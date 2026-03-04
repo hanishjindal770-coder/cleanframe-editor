@@ -1,0 +1,11 @@
+node_modules
+frontend/node_modules
+frontend/dist
+backend/__pycache__
+backend/uploads/*
+backend/frames/*
+backend/results/*
+.git
+*.pyc
+__pycache__
+.env
