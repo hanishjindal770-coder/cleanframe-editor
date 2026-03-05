@@ -238,12 +238,17 @@ function Editor({ apiBaseUrl, videoId, onProcessingComplete, onBack }) {
                 })
             });
 
+            const text = await response.text();
+            let data;
+            try { data = JSON.parse(text); } catch { data = null; }
+
             if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.detail || 'Processing failed');
+                throw new Error(data?.detail || 'Processing failed. The server may have timed out — try a shorter video.');
+            }
+            if (!data || !data.result_url) {
+                throw new Error('Server returned an incomplete response. Try processing again.');
             }
 
-            const data = await response.json();
             onProcessingComplete(data.result_url);
         } catch (err) {
             setError(err.message);
@@ -264,14 +269,18 @@ function Editor({ apiBaseUrl, videoId, onProcessingComplete, onBack }) {
                 method: 'POST'
             });
 
+            const text = await response.text();
+            let data;
+            try { data = JSON.parse(text); } catch { data = null; }
+
             if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.detail || 'Auto-detection failed');
+                throw new Error(data?.detail || 'Auto-detection failed. The server may have timed out.');
+            }
+            if (!data) {
+                throw new Error('Server returned an incomplete response. Try again.');
             }
 
-            const data = await response.json();
-
-            if (data.detections.length === 0) {
+            if (!data.detections || data.detections.length === 0) {
                 setError('No text or watermarks detected in the video');
                 return;
             }
@@ -353,12 +362,16 @@ function Editor({ apiBaseUrl, videoId, onProcessingComplete, onBack }) {
                 method: 'POST'
             });
 
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.detail || 'Auto-processing failed');
-            }
+            const text = await response.text();
+            let data;
+            try { data = JSON.parse(text); } catch { data = null; }
 
-            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data?.detail || 'Auto-processing failed. The server may have timed out.');
+            }
+            if (!data) {
+                throw new Error('Server returned an incomplete response. Try again.');
+            }
 
             if (!data.result_url) {
                 setError(data.message || 'No text detected to remove');
