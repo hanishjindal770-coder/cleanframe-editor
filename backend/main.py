@@ -820,7 +820,10 @@ def group_similar_regions(detections: list, threshold: int = 40) -> list:
 
 @app.get("/")
 async def root():
-    """Health check endpoint."""
+    """Serve the React frontend at root."""
+    frontend_index = FRONTEND_DIR / "index.html"
+    if frontend_index.exists():
+        return FileResponse(str(frontend_index))
     return {"message": "CleanFrame Editor API is running", "version": "1.0.0"}
 
 
